@@ -9,11 +9,17 @@ jsContract = function (rules, fn) {
 };
 jsContract.prototype.applyContract = function (rules, fn) {
   this.paramMap = this.getParamMap(fn);
-  var processedRules = rules.map(this.processRule, this);
+  var preRules;
+  if (rules.pre) {
+    preRules = rules.pre.map(this.processRule, this);
+  }
+  else {
+    preRules = [];
+  }
   return function () {
     var that = this;
     var args = arguments;
-    processedRules.forEach(function (rule) {
+    preRules.forEach(function (rule) {
       rule.apply(that, args);
     });
   };
