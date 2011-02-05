@@ -61,8 +61,8 @@ jsContract.prototype.processRule = function (rule) {
       "args["+this.paramMap[paramName]+"]");
   }
   return function (args, result) {
-    var result = eval(transformedRule);
-    if (!result) {
+    var ruleResult = eval(transformedRule);
+    if (!ruleResult) {
       throw "Rule failed: "+rule;
     }
   };
