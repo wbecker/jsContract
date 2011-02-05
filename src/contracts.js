@@ -9,7 +9,20 @@ jsContract = function (rules, fn) {
 };
 jsContract.prototype.applyContract = function (rules, fn) {
   this.paramMap = this.getParamMap(fn);
-  var preRules, postRules;
+  var isConstructor, invariantRules, preRules, postRules;
+  isConstructor = !!rules.constructor;
+  if (isConstructor) {
+    if (rules.invariant) {
+      invariantRules = rules.invariant.map(this.processRule, this);
+    }
+    else {
+      invariantRules = [];
+    }
+    this.__invariantRules = invariantRules;
+  }
+  else {
+    invariantRules = this.__invariantRules;
+  }
   if (rules.pre) {
     preRules = rules.pre.map(this.processRule, this);
   }
@@ -26,10 +39,18 @@ jsContract.prototype.applyContract = function (rules, fn) {
     var that = this;
     var args = arguments;
     var result;
+    if (!isConstructor) {
+      invariantRules.forEach(function (rule) {
+        rule.apply(that, [args, result]);
+      });
+    }
     preRules.forEach(function (rule) {
       rule.apply(that, [args, result]);
     });
     result = fn.apply(that, args);
+    invariantRules.forEach(function (rule) {
+      rule.apply(that, [args, result]);
+    });
     postRules.forEach(function (rule) {
       rule.apply(that, [args, result]);
     });
