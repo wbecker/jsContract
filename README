@@ -1,6 +1,8 @@
-jsContracts aims to port cofoja (http://code.google.com/p/cofoja/) to javascript.
+jsContracts aims to port cofoja (http://code.google.com/p/cofoja/) to Javascript.
 
-Instead of using annotations, jsContract wraps your class up in jsContract object. If you don't want to use use contracts (ie this is production code), turn it off, by setting contractsOn = false. In this case, your functions are defined normally and no checking occurs.
+Instead of using annotations, jsContract wraps your class up in a jsContract object. If you don't want to use contracts (ie this is production code), you can turn it off, by setting contractsOn = false. In this case, your functions are defined normally and no checking occurs.
+
+It works well in Firefox, but it does rely on being able to toString() functions to work out parameter names (this could be got around by only specifying parameter indexes for non-supportive browsers, instead of using named parameters) and rich array functions, eg forEach. If your browser doesn't support this, you could use Underscore.js (http://documentcloud.github.com/underscore/).
 
 It handles the 4 main contract types: 
 
@@ -27,6 +29,7 @@ Differences from cofoja:
  * slight changing of syntax, eg uses square braces instead of curly braces for arrays of a contract type.
  * only handles multi-clause contracts, not single simple-contracts(though this won't be hard to implement)
  * constructors have to be explictly defined, since Javascript doesn't really let you create explicit objects. (see http://stackoverflow.com/questions/367768/)
+ * Class variables and methods need to be specified by "this", ie "this.myVariable" - cofoja doesn't require such a prefix, but such is the nature of Javascript!
 
 See the two test files, test/Person.js and test/time.js for examples.
 
