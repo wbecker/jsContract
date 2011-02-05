@@ -1,13 +1,27 @@
 var time = function () {
 };
 
-time.prototype.setHour = new jsContract({pre:["hour >= 0", "hour <= 23"]}, function (hour) {
-  this.hour = hour;
-});
+time.prototype.setHour = 
+  new jsContract({
+    pre:[
+      "hour >= 0", 
+      "hour <= 23"
+    ]}, 
+    function (hour) {
+      this.hour = hour;
+    }
+  );
 
-time.prototype.getHour = new jsContract({post:["result >= 0", "result <= 23"]}, function () {
-  return this.hour;
-});
+time.prototype.getHour = 
+  new jsContract({
+    post:[
+      "result >= 0", 
+      "result <= 23"
+    ]}, 
+    function () {
+      return this.hour;
+    }
+  );
 
 var t = new time();
 var test = function (f) {
