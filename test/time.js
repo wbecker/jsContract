@@ -34,31 +34,39 @@ var test = function (f) {
 }
 
 test(function () {
+  console.debug("set hour to -1, expect rule to fail");
   t.setHour(-1);
 });
 test(function () {
+  console.debug("set hour to 0, expect rule to pass");
   t.setHour(0);
 });
 test(function () {
+  console.debug("set hour to 23, expect rule to pass");
   t.setHour(23);
 });
 test(function () {
+  console.debug("set hour to 24, expect rule to fail");
   t.setHour(24);
 });
 
 test(function () {
   t.hour=-1;
+  console.debug("get hour when hour is -1, expect rule to fail");
   t.getHour();
 });
 test(function () {
   t.hour=0;
+  console.debug("get hour when hour is 0, expect rule to pass");
   t.getHour();
 });
 test(function () {
   t.hour=23;
+  console.debug("get hour when hour is 23, expect rule to pass");
   t.getHour();
 });
 test(function () {
   t.hour=24;
+  console.debug("get hour when hour is 24, expect rule to fail");
   t.getHour();
 });
