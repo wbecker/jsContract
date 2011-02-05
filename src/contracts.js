@@ -9,26 +9,38 @@ jsContract = function (rules, fn) {
 };
 jsContract.prototype.applyContract = function (rules, fn) {
   this.paramMap = this.getParamMap(fn);
-  var preRules;
+  var preRules, postRules;
   if (rules.pre) {
     preRules = rules.pre.map(this.processRule, this);
   }
   else {
     preRules = [];
   }
+  if (rules.post) {
+    postRules = rules.post.map(this.processRule, this);
+  }
+  else {
+    postRules = [];
+  } 
   return function () {
     var that = this;
     var args = arguments;
+    var result;
     preRules.forEach(function (rule) {
-      rule.apply(that, args);
+      rule.apply(that, [args, result]);
     });
+    result = fn.apply(that, args);
+    postRules.forEach(function (rule) {
+      rule.apply(that, [args, result]);
+    });
+    return result;
   };
 };
 jsContract.prototype.getParamMap = function (fn) {
   var reg, params, paramNames, paramMap;
   reg = /\(([\s\S]*?)\)/;
   params = reg.exec(fn);
-  if (params) {
+  if (params && (params[1] !== "")) {
     paramNames = params[1].split(',');
   }
   else {
@@ -46,9 +58,9 @@ jsContract.prototype.processRule = function (rule) {
   for (paramName in this.paramMap) {
     regEx = new RegExp(paramName, "g");
     transformedRule = transformedRule.replace(regEx, 
-      "arguments["+this.paramMap[paramName]+"]");
+      "args["+this.paramMap[paramName]+"]");
   }
-  return function () {
+  return function (args, result) {
     var result = eval(transformedRule);
     if (!result) {
       throw "Rule failed: "+rule;
