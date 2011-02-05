@@ -1,1 +1,32 @@
 jsContracts aims to port cofoja (http://code.google.com/p/cofoja/) to javascript.
+
+Instead of using annotations, jsContract wraps your class up in jsContract object. If you don't want to use use contracts (ie this is production code), turn it off, by setting contractsOn = false. In this case, your functions are defined normally and no checking occurs.
+
+It handles the 4 main contract types: 
+
+ * Invariants (invariant), checked when entering and exiting methods, and exiting the constructor.
+ * Preconditions (pre), checked when entering methods.
+ * Postconditions (post), checked when exiting methods normally.
+ * ThrowEnsures (throwEnsures), checked when exiting methods normally.
+
+Syntax:
+
+<your variable>  = jsContract(<rules>, <function definition>);
+
+where rules => {
+  constructor: true/false, //non-optional if constructor with invariants, optional otherwise
+  invariant: [statement1, statement2, ...], //optional
+  pre: [statement1, statement2, ...], //optional
+  post: [statement1, statement2, ...], //optional
+  throwEnsures: [ ["ExceptionType1", "condition1"], ["ExceptionType2", "condition2"], ...] //optional
+}
+
+Differences from cofoja:
+
+ * uses pre and post instead of Requires and Ensures.
+ * slight changing of syntax, eg uses square braces instead of curly braces for arrays of a contract type.
+ * only handles multi-clause contracts, not single simple-contracts(though this won't be hard to implement)
+ * constructors have to be explictly defined, since Javascript doesn't really let you create explicit objects. (see http://stackoverflow.com/questions/367768/)
+
+See the two test files, test/Person.js and test/time.js for examples.
+
