@@ -36,34 +36,29 @@ jsContract.prototype.applyRules = function (
     that = this;
     args = arguments;
     if (!isConstructor) {
-      invariantRules.forEach(function (rule) {
-        rule.apply(that, [args, result]);
-      });
+      jsContract.applyRuleSet(invariantRules, that, args, result);
     }
-    preRules.forEach(function (rule) {
-      rule.apply(that, [args, result]);
-    });
+    jsContract.applyRuleSet(preRules, that, args, result);
     try {
       result = fn.apply(that, args);
     }
     catch (e) {
       ex = e;
     }
-    invariantRules.forEach(function (rule) {
-      rule.apply(that, [args, result]);
-    });
+    jsContract.applyRuleSet(invariantRules, that, args, result);
     if (!ex) {
-      postRules.forEach(function (rule) {
-        rule.apply(that, [args, result]);
-      });
+      jsContract.applyRuleSet(postRules, that, args, result);
     }
     else {
-      throwRules.forEach(function (rule) {
-        rule.apply(that, [args, ex]);
-      });
+      jsContract.applyRuleSet(throwRules, that, args, ex);
     }
     return result;
   };
+};
+jsContract.applyRuleSet = function (ruleSet, that, args, result) {
+  ruleSet.forEach(function (rule) {
+    rule.apply(that, [args, result]);
+  });
 };
 jsContract.prototype.getParamMap = function (fn) {
   var reg, params, paramNames, paramMap;
