@@ -47,9 +47,9 @@ jsContract.prototype.processRuleSet = function (ruleSet, ruleProcessor) {
 };
 jsContract.prototype.processRule = function (rule) {
   var transformedRule = this.transformRule(rule);
-  return this.applyRule(rule, transformedRule);
+  return this.createRuleApplier(rule, transformedRule);
 };
-jsContract.prototype.applyRule = function (rule, transformedRule) {
+jsContract.prototype.createRuleApplier = function (rule, transformedRule) {
   return function (args, result) {
     var ruleResult = eval(transformedRule);
     if (!ruleResult) {
@@ -59,9 +59,9 @@ jsContract.prototype.applyRule = function (rule, transformedRule) {
 };
 jsContract.prototype.processThrowRule = function (rule) {
   var transformedRule = this.transformRule(rule[1]);
-  return this.applyExceptionRule(rule[1], rule[0], transformedRule);
+  return this.createExceptionRuleApplier(rule[1], rule[0], transformedRule);
 };
-jsContract.prototype.applyExceptionRule = function (
+jsContract.prototype.createExceptionRuleApplier = function (
     rule, exceptionType, transformedRule) {
   return function (args, ex) {
     var ruleResult = eval(transformedRule);
