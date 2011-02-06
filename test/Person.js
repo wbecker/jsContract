@@ -16,7 +16,9 @@ var personTest = function () {
   Person.prototype.getName = 
     new jsContract({
         post: [
-          "result == this.name"
+          "result === this.name",
+          "this.name === old(this.name)"
+
         ]
       },
       function () {
@@ -28,10 +30,12 @@ var personTest = function () {
         pre: [
           "name !== null",
           "name !== undefined",
-          "name.length > 0"
+          "name.length > 0",
+          "name !== this.getName()"
         ],
         post: [
-          "this.getName() == name"
+          "this.getName() == name",
+          "this.getName() !== old(this.getName())"
         ]
       },
       function (name) {
@@ -80,6 +84,10 @@ var personTest = function () {
       p.setName("");
     });
   assertDoesntThrowException("setName with a non-empty string should pass", 
+    function () {
+      p.setName("Jim");
+    });
+  assertThrowsException("setName called with the same name twice should fail", 
     function () {
       p.setName("Jim");
     });
