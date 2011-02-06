@@ -58,47 +58,39 @@ var personTest = function () {
       throw new Error("bad syntax");
     });
   
-  var test = function (f) {
-    try {
-      f();
-    }
-    catch (e) {
-      console.debug(e);
-    }
-  }
-  test(function () {
-    console.debug("Create person with no argument, expect rule to fail");
+  assertThrowsException("Create person with no argument, expect rule to fail", 
+    function () {
     new Person();
   });
   var p = new Person("Bob");
-  test(function () {
-    console.debug("getName on a properly instantiated Person should pass");
-    p.getName();
-  });
-  test(function () {
-    console.debug("setName with a null argument will fail");
-    p.setName(null);
-  });
-  test(function () {
-    console.debug("setName with no argument will fail");
-    p.setName();
-  });
-  test(function () {
-    console.debug("setName with an empty argument should fail");
-    p.setName("");
-  });
-  test(function () {
-    console.debug("setName with a non-empty string should pass");
-    p.setName("Jim");
-  });
-  test(function () {
-    console.debug("Calling textExceptionOk should pass");
-    p.testExceptionOk();
-  });
-  test(function () {
-    console.debug("Calling textExceptionBad should fail");
-    p.testExceptionBad();
-  });
+  assertDoesntThrowException("getName on a properly instantiated Person should pass", 
+    function () {
+      p.getName();
+    });
+  assertThrowsException("setName with a null argument will fail", 
+    function () {
+      p.setName(null);
+    });
+  assertThrowsException("setName with no argument will fail", 
+    function () {
+      p.setName();
+    });
+  assertThrowsException("setName with an empty argument should fail", 
+    function () {
+      p.setName("");
+    });
+  assertDoesntThrowException("setName with a non-empty string should pass", 
+    function () {
+      p.setName("Jim");
+    });
+  assertDoesntThrowException("Calling textExceptionOk should pass", 
+    function () {
+      p.testExceptionOk();
+    });
+  assertThrowsException("Calling textExceptionBad should fail", 
+    function () {
+      p.testExceptionBad();
+    });
 }
 
 try {
