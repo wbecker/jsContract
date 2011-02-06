@@ -11,6 +11,8 @@ It handles the 4 main contract types:
  * Postconditions (post), checked when exiting methods normally.
  * ThrowEnsures (throwEnsures), checked when exiting methods normally.
 
+as well as the old() keyword.
+
 Syntax:
 
 <your variable>  = jsContract(<rules>, <function definition>);
