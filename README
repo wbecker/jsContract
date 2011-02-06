@@ -30,6 +30,7 @@ Differences from cofoja:
  * only handles multi-clause contracts, not single simple-contracts(though this won't be hard to implement)
  * constructors have to be explictly defined, since Javascript doesn't really let you create explicit objects. (see http://stackoverflow.com/questions/367768/)
  * Class variables and methods need to be specified by "this", ie "this.myVariable" - cofoja doesn't require such a prefix, but such is the nature of Javascript!
+ * It doesn't handle the => operator. As issue #7 of cofoja suggests (http://code.google.com/p/cofoja/issues/detail?id=7) you can use the ?: operator instead.
 
 See the two test files, test/Person.js and test/time.js for examples.
 
