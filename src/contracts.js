@@ -12,35 +12,25 @@ jsContract.prototype.applyContract = function (rules, fn) {
   this.paramMap = this.getParamMap(fn);
   isConstructor = !!rules.constructor;
   if (isConstructor) {
-    if (rules.invariant) {
-      invariantRules = rules.invariant.map(this.processRule, this);
-    }
-    else {
-      invariantRules = [];
-    }
+    invariantRules = this.processRuleSet(rules.invariant);
     this.__invariantRules = invariantRules;
   }
   else {
     invariantRules = this.__invariantRules;
   }
-  if (rules.pre) {
-    preRules = rules.pre.map(this.processRule, this);
-  }
-  else {
-    preRules = [];
-  }
-  if (rules.post) {
-    postRules = rules.post.map(this.processRule, this);
-  }
-  else {
-    postRules = [];
-  } 
-  if (rules.throwEnsures) {
-    throwRules = rules.throwEnsures.map(this.processThrowRule, this);
-  }
-  else {
-    throwRules = [];
-  }
+  preRules = this.processRuleSet(rules.pre);
+  postRules = this.processRuleSet(rules.post);
+  throwRules = this.processRuleSet(rules.throwEnsures, this.processThrowRule);
+  return this.applyRules(fn, isConstructor, preRules, postRules, invariantRules, 
+    throwRules);
+};
+jsContract.prototype.processRuleSet = function (ruleSet, ruleProcessor) {
+  var processedRules, ruleProcessorToApply;
+  ruleProcessorToApply = ruleProcessor ? ruleProcessor : this.processRule;
+  return ruleSet ?  ruleSet.map(ruleProcessorToApply, this) : [];
+};
+jsContract.prototype.applyRules = function (
+    fn, isConstructor, preRules, postRules, invariantRules, throwRules) {
   return function () {
     var that, args, result, ex;
     that = this;
