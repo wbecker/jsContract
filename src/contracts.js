@@ -48,11 +48,12 @@ jsContract.prototype.applyRules = function (
     jsContract.applyRuleSet(invariantRules, that, args, result);
     if (!ex) {
       jsContract.applyRuleSet(postRules, that, args, result);
+      return result;
     }
     else {
       jsContract.applyRuleSet(throwRules, that, args, ex);
+      throw ex;
     }
-    return result;
   };
 };
 jsContract.applyRuleSet = function (ruleSet, that, args, result) {

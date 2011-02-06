@@ -83,10 +83,11 @@ var personTest = function () {
     function () {
       p.setName("Jim");
     });
-  assertDoesntThrowException("Calling textExceptionOk should pass", 
+  assertThrowsExceptionOfType("Calling textExceptionOk should pass", 
     function () {
       p.testExceptionOk();
-    });
+    },
+    SyntaxError);
   assertThrowsException("Calling textExceptionBad should fail", 
     function () {
       p.testExceptionBad();
