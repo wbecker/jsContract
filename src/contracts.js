@@ -1,12 +1,13 @@
-contractsOn = true;
+/*global jsContract: true, _: false */
 jsContract = function (rules, fn) {
-  if (!contractsOn) {
+  if (!jsContract.contractsOn) {
     return fn;
   }
   else {
     return this.applyContract(rules, fn);
   }
 };
+jsContract.contractsOn = true;
 jsContract.execId = 0;
 jsContract.prototype.applyContract = function (rules, fn) {
   var isConstructor, invariantRules, preRules, postRules, throwRules;
@@ -22,8 +23,8 @@ jsContract.prototype.applyContract = function (rules, fn) {
   preRules = this.processRuleSet(rules.pre, this.processRule);
   postRules = this.processRuleSet(rules.post, this.processRuleWithOld);
   throwRules = this.processRuleSet(rules.throwEnsures, this.processThrowRule);
-  return this.applyRules(fn, isConstructor, preRules, postRules, invariantRules, 
-    throwRules);
+  return this.applyRules(fn, isConstructor, preRules, postRules, 
+    invariantRules, throwRules);
 };
 jsContract.prototype.getParamMap = function (fn) {
   var reg, params, paramNames, paramMap;
@@ -76,12 +77,12 @@ jsContract.getOldValues = function (regEx, rule) {
   i = start;
   while ((open > 0) && (i < rule.length)) {
     if (rule[i] === "(") {
-      open++;
+      open+=1;
     }
     else if (rule[i] === ")") {
-      open--;
+      open-=1;
     }
-    i++;
+    i+=1;
   }
   if ((open > 0) && (i===rule.length)) {
     throw new Error("parentheses do no match in rule: \""+rule+"\"");
@@ -97,7 +98,8 @@ jsContract.prototype.updateRuleForOldValues = function (rule,
   requiredOldValues.forEach(function (requiredOldValue) {
     var oldValue, newValue;
     oldValue = requiredOldValue[0];
-    newValue = "__oldVals__[\""+requiredOldValue[1]+"\"+this.__execId]";
+    newValue = "jsContract.__oldVals__[\"" + requiredOldValue[1] + 
+      "\"+this.__execId]";
     transformedRule = transformedRule.replace(oldValue, newValue);
   });
   return transformedRule;
@@ -143,14 +145,15 @@ jsContract.prototype.applyRules = function (
   return function () {
     var that, args, result, ex;
     this.__execId = jsContract.execId;
-    jsContract.execId++;
+    jsContract.execId+=1;
     that = this;
     args = arguments;
     if (!isConstructor) {
       jsContract.applyRuleSet(invariantRules, that, args);
     }
     jsContract.applyRuleSet(preRules, that, args);
-    jsContractContext.gatherRequiredValues(postRules, that, args, this.__execId);
+    jsContractContext.gatherRequiredValues(postRules, that, args, 
+      this.__execId);
     try {
       result = fn.apply(that, args);
     }
@@ -173,16 +176,17 @@ jsContract.applyRuleSet = function (ruleSet, that, args, result) {
     rule.apply(that, [args, result]);
   });
 };
-jsContract.prototype.gatherRequiredValues = function (ruleSet, that, args, execId) {
+jsContract.prototype.gatherRequiredValues = function (ruleSet, that, args, 
+    execId) {
   if (ruleSet.length === 0) {
     return;
   }
-  __oldVals__ = {};
+  jsContract.__oldVals__ = {};
   ruleSet.forEach(function (rule) {
     if ((rule.requiredOldValues) && (rule.requiredOldValues.length > 0)) {
       rule.requiredOldValues.forEach(function (requiredOldValue) {
         _.bind(function () {
-          __oldVals__[requiredOldValue[1]+execId] = eval(requiredOldValue[1]);
+          jsContract.__oldVals__[requiredOldValue[1]+execId] = eval(requiredOldValue[1]);
         }, that)();
       });
     }
