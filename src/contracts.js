@@ -2,8 +2,7 @@
 jsContract = function (rules, fn) {
   if (!jsContract.contractsOn) {
     return fn;
-  }
-  else {
+  } else {
     return this.applyContract(rules, fn);
   }
 };
@@ -16,8 +15,7 @@ jsContract.prototype.applyContract = function (rules, fn) {
   if (isConstructor) {
     invariantRules = this.processRuleSet(rules.invariant, this.processRule);
     this.__invariantRules = invariantRules;
-  }
-  else {
+  } else {
     invariantRules = this.__invariantRules;
   }
   preRules = this.processRuleSet(rules.pre, this.processRule);
@@ -32,8 +30,7 @@ jsContract.prototype.getParamMap = function (fn) {
   params = reg.exec(fn);
   if (params && (params[1] !== "")) {
     paramNames = params[1].split(',');
-  }
-  else {
+  } else {
     paramNames = [];
   }
   paramMap = {};
@@ -77,18 +74,17 @@ jsContract.getOldValues = function (regEx, rule) {
   i = start;
   while ((open > 0) && (i < rule.length)) {
     if (rule[i] === "(") {
-      open+=1;
+      open += 1;
+    } else if (rule[i] === ")") {
+      open -= 1;
     }
-    else if (rule[i] === ")") {
-      open-=1;
-    }
-    i+=1;
+    i += 1;
   }
   if ((open > 0) && (i===rule.length)) {
-    throw new Error("parentheses do no match in rule: \""+rule+"\"");
+    throw new Error("parentheses do no match in rule: \"" + rule + "\"");
   }
   text = rule.substring(start-4, i);
-  value = text.substring(4,text.length-1);
+  value = text.substring(4, text.length-1);
   regEx.lastIndex = i;
   return [text, value];
 };
@@ -99,7 +95,7 @@ jsContract.prototype.updateRuleForOldValues = function (rule,
     var oldValue, newValue;
     oldValue = requiredOldValue[0];
     newValue = "jsContract.__oldVals__[\"" + requiredOldValue[1] + 
-      "\"+this.__execId]";
+      "\" + this.__execId]";
     transformedRule = transformedRule.replace(oldValue, newValue);
   });
   return transformedRule;
@@ -108,7 +104,7 @@ jsContract.prototype.createRuleApplier = function (rule, transformedRule) {
   return function (args, result) {
     var ruleResult = eval(transformedRule);
     if (!ruleResult) {
-      throw "Rule failed: "+rule;
+      throw "Rule failed: " + rule;
     }
   };
 };
@@ -121,8 +117,8 @@ jsContract.prototype.createExceptionRuleApplier = function (
   return function (args, ex) {
     var ruleResult = eval(transformedRule);
     if (ruleResult) {
-      if (!(eval("ex instanceof "+exceptionType))) {
-        throw "Rule failed: when "+rule+", throw "+exceptionType;
+      if (!(eval("ex instanceof " + exceptionType))) {
+        throw "Rule failed: when " + rule + ", throw " + exceptionType;
       }
     }
   };
@@ -134,7 +130,7 @@ jsContract.prototype.transformRule = function (rule) {
     if (this.paramMap.hasOwnProperty(paramName)) {
       regEx = new RegExp(paramName, "g");
       transformedRule = transformedRule.replace(regEx, 
-        "args["+this.paramMap[paramName]+"]");
+        "args[" + this.paramMap[paramName] + "]");
     }
   }
   return transformedRule;
@@ -145,7 +141,7 @@ jsContract.prototype.applyRules = function (
   return function () {
     var that, args, result, ex;
     this.__execId = jsContract.execId;
-    jsContract.execId+=1;
+    jsContract.execId += 1;
     that = this;
     args = arguments;
     if (!isConstructor) {
@@ -164,8 +160,7 @@ jsContract.prototype.applyRules = function (
     if (!ex) {
       jsContract.applyRuleSet(postRules, that, args, result);
       return result;
-    }
-    else {
+    } else {
       jsContract.applyRuleSet(throwRules, that, args, ex);
       throw ex;
     }
@@ -186,7 +181,8 @@ jsContract.prototype.gatherRequiredValues = function (ruleSet, that, args,
     if ((rule.requiredOldValues) && (rule.requiredOldValues.length > 0)) {
       rule.requiredOldValues.forEach(function (requiredOldValue) {
         _.bind(function () {
-          jsContract.__oldVals__[requiredOldValue[1]+execId] = eval(requiredOldValue[1]);
+          jsContract.__oldVals__[requiredOldValue[1] + execId] = 
+            eval(requiredOldValue[1]);
         }, that)();
       });
     }
