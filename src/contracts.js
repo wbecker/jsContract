@@ -112,8 +112,8 @@ jsContract.prototype.processThrowRule = function (rule) {
   var transformedRule = this.transformRule(rule[1]);
   return this.createExceptionRuleApplier(rule[1], rule[0], transformedRule);
 };
-jsContract.prototype.createExceptionRuleApplier = function (
-  rule, exceptionType, transformedRule) {
+jsContract.prototype.createExceptionRuleApplier = function (rule, 
+  exceptionType, transformedRule) {
   return function (args, ex) {
     var ruleResult = eval(transformedRule);
     if (ruleResult) {
