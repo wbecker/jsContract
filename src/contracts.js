@@ -80,11 +80,11 @@ jsContract.getOldValues = function (regEx, rule) {
     }
     i += 1;
   }
-  if ((open > 0) && (i===rule.length)) {
+  if ((open > 0) && (i === rule.length)) {
     throw new Error("parentheses do no match in rule: \"" + rule + "\"");
   }
-  text = rule.substring(start-4, i);
-  value = text.substring(4, text.length-1);
+  text = rule.substring(start - 4, i);
+  value = text.substring(4, text.length - 1);
   regEx.lastIndex = i;
   return [text, value];
 };
@@ -113,7 +113,7 @@ jsContract.prototype.processThrowRule = function (rule) {
   return this.createExceptionRuleApplier(rule[1], rule[0], transformedRule);
 };
 jsContract.prototype.createExceptionRuleApplier = function (
-    rule, exceptionType, transformedRule) {
+  rule, exceptionType, transformedRule) {
   return function (args, ex) {
     var ruleResult = eval(transformedRule);
     if (ruleResult) {
@@ -135,8 +135,8 @@ jsContract.prototype.transformRule = function (rule) {
   }
   return transformedRule;
 };
-jsContract.prototype.applyRules = function (
-    fn, isConstructor, preRules, postRules, invariantRules, throwRules) {
+jsContract.prototype.applyRules = function (fn, isConstructor, preRules, 
+  postRules, invariantRules, throwRules) {
   var jsContractContext = this;
   return function () {
     var that, args, result, ex;
@@ -152,8 +152,7 @@ jsContract.prototype.applyRules = function (
       this.__execId);
     try {
       result = fn.apply(that, args);
-    }
-    catch (e) {
+    } catch (e) {
       ex = e;
     }
     jsContract.applyRuleSet(invariantRules, that, args);
