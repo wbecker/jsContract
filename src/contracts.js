@@ -60,7 +60,7 @@ jsContract.prototype.processRuleWithOld = function (rule) {
 };
 jsContract.prototype.gatherRequiredOldValues = function (rule) {
   var regEx, match, requiredOldValues;
-  regEx = /old\(/g
+  regEx = /old\(/g;
   match = regEx.exec(rule);
   requiredOldValues = [];
   while (match) {
@@ -71,7 +71,7 @@ jsContract.prototype.gatherRequiredOldValues = function (rule) {
 };
 jsContract.getOldValues = function (regEx, rule) {
   var open, start, i, text, value;
-  open = 1
+  open = 1;
   start = regEx.lastIndex;
   i = start;
   while ((open > 0) && (i < rule.length)) {
@@ -90,7 +90,7 @@ jsContract.getOldValues = function (regEx, rule) {
   value = text.substring(4,text.length-1);
   regEx.lastIndex = i;
   return [text, value];
-}
+};
 jsContract.prototype.updateRuleForOldValues = function (rule, 
   requiredOldValues) {
   var transformedRule = rule;
@@ -101,7 +101,7 @@ jsContract.prototype.updateRuleForOldValues = function (rule,
     transformedRule = transformedRule.replace(oldValue, newValue);
   });
   return transformedRule;
-}
+};
 jsContract.prototype.createRuleApplier = function (rule, transformedRule) {
   return function (args, result) {
     var ruleResult = eval(transformedRule);
@@ -129,9 +129,11 @@ jsContract.prototype.transformRule = function (rule) {
   var paramName, regEx, transformedRule;
   transformedRule = rule;
   for (paramName in this.paramMap) {
-    regEx = new RegExp(paramName, "g");
-    transformedRule = transformedRule.replace(regEx, 
-      "args["+this.paramMap[paramName]+"]");
+    if (this.paramMap.hasOwnProperty(paramName)) {
+      regEx = new RegExp(paramName, "g");
+      transformedRule = transformedRule.replace(regEx, 
+        "args["+this.paramMap[paramName]+"]");
+    }
   }
   return transformedRule;
 };
