@@ -1,15 +1,15 @@
-/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: false, regexp: true, plusplus: true, bitwise: true, evil: true, maxerr: 50, maxlen: 80, indent: 2 */
-/*global jsContract: true, _: false */
-jsContract = function (rules, fn) {
-  if (!jsContract.contractsOn) {
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: false, regexp: true, plusplus: true, bitwise: true, evil: true, maxerr: 5, maxlen: 80, indent: 2 */
+/*global JsContract: true, _: false */
+JsContract = function (rules, fn) {
+  if (!JsContract.contractsOn) {
     return fn;
   } else {
     return this.applyContract(rules, fn);
   }
 };
-jsContract.contractsOn = true;
-jsContract.execId = 0;
-jsContract.prototype.applyContract = function (rules, fn) {
+JsContract.contractsOn = true;
+JsContract.execId = 0;
+JsContract.prototype.applyContract = function (rules, fn) {
   var isConstructor, invariantRules, preRules, postRules, throwRules;
   this.paramMap = this.getParamMap(fn);
   isConstructor = !!rules.constructor;
@@ -25,7 +25,7 @@ jsContract.prototype.applyContract = function (rules, fn) {
   return this.applyRules(fn, isConstructor, preRules, postRules, 
     invariantRules, throwRules);
 };
-jsContract.prototype.getParamMap = function (fn) {
+JsContract.prototype.getParamMap = function (fn) {
   var reg, params, paramNames, paramMap;
   reg = /\(([\s\S]*?)\)/;
   params = reg.exec(fn);
@@ -36,18 +36,18 @@ jsContract.prototype.getParamMap = function (fn) {
   }
   paramMap = {};
   paramNames.forEach(function (paramName, index) {
-    paramMap[paramName] = index; 
+    paramMap[paramName.trim()] = index; 
   });
   return paramMap;
 };
-jsContract.prototype.processRuleSet = function (ruleSet, ruleProcessor) {
+JsContract.prototype.processRuleSet = function (ruleSet, ruleProcessor) {
   return ruleSet ?  ruleSet.map(ruleProcessor, this) : [];
 };
-jsContract.prototype.processRule = function (rule) {
+JsContract.prototype.processRule = function (rule) {
   var transformedRule = this.transformRule(rule);
   return this.createRuleApplier(rule, transformedRule);
 };
-jsContract.prototype.processRuleWithOld = function (rule) {
+JsContract.prototype.processRuleWithOld = function (rule) {
   var transformedRule, requiredOldValues, ruleApplier;
   transformedRule = this.transformRule(rule);
   requiredOldValues = this.gatherRequiredOldValues(transformedRule);
@@ -57,18 +57,18 @@ jsContract.prototype.processRuleWithOld = function (rule) {
   ruleApplier.requiredOldValues = requiredOldValues;
   return ruleApplier;
 };
-jsContract.prototype.gatherRequiredOldValues = function (rule) {
+JsContract.prototype.gatherRequiredOldValues = function (rule) {
   var regEx, match, requiredOldValues;
   regEx = /old\(/g;
   match = regEx.exec(rule);
   requiredOldValues = [];
   while (match) {
-    requiredOldValues.push(jsContract.getOldValues(regEx, rule));
+    requiredOldValues.push(this.getOldValues(regEx, rule));
     match = regEx.exec(rule);
   }
   return requiredOldValues;
 };
-jsContract.getOldValues = function (regEx, rule) {
+JsContract.prototype.getOldValues = function (regEx, rule) {
   var open, start, i, text, value;
   open = 1;
   start = regEx.lastIndex;
@@ -89,19 +89,19 @@ jsContract.getOldValues = function (regEx, rule) {
   regEx.lastIndex = i;
   return [text, value];
 };
-jsContract.prototype.updateRuleForOldValues = function (rule, 
+JsContract.prototype.updateRuleForOldValues = function (rule, 
   requiredOldValues) {
   var transformedRule = rule;
   requiredOldValues.forEach(function (requiredOldValue) {
     var oldValue, newValue;
     oldValue = requiredOldValue[0];
-    newValue = "jsContract.__oldVals__[\"" + requiredOldValue[1] + 
+    newValue = "JsContract.__oldVals__[\"" + requiredOldValue[1] + 
       "\" + this.__execId]";
     transformedRule = transformedRule.replace(oldValue, newValue);
   });
   return transformedRule;
 };
-jsContract.prototype.createRuleApplier = function (rule, transformedRule) {
+JsContract.prototype.createRuleApplier = function (rule, transformedRule) {
   return function (args, result) {
     var ruleResult = eval(transformedRule);
     if (!ruleResult) {
@@ -109,11 +109,11 @@ jsContract.prototype.createRuleApplier = function (rule, transformedRule) {
     }
   };
 };
-jsContract.prototype.processThrowRule = function (rule) {
+JsContract.prototype.processThrowRule = function (rule) {
   var transformedRule = this.transformRule(rule[1]);
   return this.createExceptionRuleApplier(rule[1], rule[0], transformedRule);
 };
-jsContract.prototype.createExceptionRuleApplier = function (rule, 
+JsContract.prototype.createExceptionRuleApplier = function (rule, 
   exceptionType, transformedRule) {
   return function (args, ex) {
     var ruleResult = eval(transformedRule);
@@ -124,7 +124,7 @@ jsContract.prototype.createExceptionRuleApplier = function (rule,
     }
   };
 };
-jsContract.prototype.transformRule = function (rule) {
+JsContract.prototype.transformRule = function (rule) {
   var paramName, regEx, transformedRule;
   transformedRule = rule;
   for (paramName in this.paramMap) {
@@ -136,19 +136,19 @@ jsContract.prototype.transformRule = function (rule) {
   }
   return transformedRule;
 };
-jsContract.prototype.applyRules = function (
+JsContract.prototype.applyRules = function (
     fn, isConstructor, preRules, postRules, invariantRules, throwRules) {
   var jsContractContext = this;
   return function () {
     var that, args, result, ex;
-    this.__execId = jsContract.execId;
-    jsContract.execId += 1;
+    this.__execId = JsContract.execId;
+    JsContract.execId += 1;
     that = this;
     args = arguments;
     if (!isConstructor) {
-      jsContract.applyRuleSet(invariantRules, that, args);
+      JsContract.applyRuleSet(invariantRules, that, args);
     }
-    jsContract.applyRuleSet(preRules, that, args);
+    JsContract.applyRuleSet(preRules, that, args);
     jsContractContext.gatherRequiredValues(postRules, that, args, 
       this.__execId);
     try {
@@ -157,35 +157,56 @@ jsContract.prototype.applyRules = function (
     catch (e) {
       ex = e;
     }
-    jsContract.applyRuleSet(invariantRules, that, args);
+    JsContract.applyRuleSet(invariantRules, that, args);
     if (!ex) {
-      jsContract.applyRuleSet(postRules, that, args, result);
+      JsContract.applyRuleSet(postRules, that, args, result);
       return result;
     } else {
-      jsContract.applyRuleSet(throwRules, that, args, ex);
+      JsContract.applyRuleSet(throwRules, that, args, ex);
       throw ex;
     }
   };
 };
-jsContract.applyRuleSet = function (ruleSet, that, args, result) {
+JsContract.applyRuleSet = function (ruleSet, that, args, result) {
   ruleSet.forEach(function (rule) {
     rule.apply(that, [args, result]);
   });
 };
-jsContract.prototype.gatherRequiredValues = function (ruleSet, that, args, 
+JsContract.prototype.gatherRequiredValues = function (ruleSet, that, args, 
     execId) {
   if (ruleSet.length === 0) {
     return;
   }
-  jsContract.__oldVals__ = {};
+  JsContract.__oldVals__ = {};
   ruleSet.forEach(function (rule) {
     if ((rule.requiredOldValues) && (rule.requiredOldValues.length > 0)) {
       rule.requiredOldValues.forEach(function (requiredOldValue) {
         _.bind(function () {
-          jsContract.__oldVals__[requiredOldValue[1] + execId] = 
+          JsContract.__oldVals__[requiredOldValue[1] + execId] = 
             eval(requiredOldValue[1]);
         }, that)();
       });
     }
   });
 };
+
+(function () {
+  var a = new JsContract({
+    isConstructor: true,
+    invariant: ["JsContract.execId >= 0"],
+    pre: ["typeof(rules) === 'object'",
+          "rules.isConstructor ? _.isBoolean(rules.isConstructor) : true",
+          "rules.pre ? _.isArray(rules.pre) : true",
+          "rules.post ? _.isArray(rules.post) : true",
+          "rules.invariant ? _.isArray(rules.invariant) : true",
+          "rules.throwEnsures ? _.isArray(rules.throwEnsures) : true",
+          "rules.pre || rules.post || " +
+             "(rules.isConstructor && rules.invariant) || rules.throwEnsures",
+          "typeof(fn) === 'function'"]
+  }, JsContract);
+  a.prototype = JsContract.prototype;
+  a.contractsOn = JsContract.contractsOn;
+  a.execId = JsContract.execId;
+  a.applyRuleSet = JsContract.applyRuleSet;
+  JsContract = a;
+}());
