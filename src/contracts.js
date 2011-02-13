@@ -1,3 +1,4 @@
+/*jslint white: true, onevar: true, undef: true, newcap: true, nomen: false, regexp: true, plusplus: true, bitwise: true, evil: true, maxerr: 50, maxlen: 80, indent: 2 */
 /*global jsContract: true, _: false */
 jsContract = function (rules, fn) {
   if (!jsContract.contractsOn) {
@@ -135,8 +136,8 @@ jsContract.prototype.transformRule = function (rule) {
   }
   return transformedRule;
 };
-jsContract.prototype.applyRules = function (fn, isConstructor, preRules, 
-  postRules, invariantRules, throwRules) {
+jsContract.prototype.applyRules = function (
+    fn, isConstructor, preRules, postRules, invariantRules, throwRules) {
   var jsContractContext = this;
   return function () {
     var that, args, result, ex;
@@ -152,7 +153,8 @@ jsContract.prototype.applyRules = function (fn, isConstructor, preRules,
       this.__execId);
     try {
       result = fn.apply(that, args);
-    } catch (e) {
+    }
+    catch (e) {
       ex = e;
     }
     jsContract.applyRuleSet(invariantRules, that, args);
