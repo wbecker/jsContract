@@ -195,14 +195,27 @@ JsContract.prototype.gatherRequiredValues = function (ruleSet, that, args,
     isConstructor: true,
     invariant: ["JsContract.execId >= 0"],
     pre: ["typeof(rules) === 'object'",
-          "rules.isConstructor ? _.isBoolean(rules.isConstructor) : true",
-          "rules.pre ? _.isArray(rules.pre) : true",
-          "rules.post ? _.isArray(rules.post) : true",
-          "rules.invariant ? _.isArray(rules.invariant) : true",
-          "rules.throwEnsures ? _.isArray(rules.throwEnsures) : true",
-          "rules.pre || rules.post || " +
-             "(rules.isConstructor && rules.invariant) || rules.throwEnsures",
-          "typeof(fn) === 'function'"]
+          //There must be either a pre, post, throwEnsures or 
+          //both an isConstructor and invariant
+          "!_.isUndefined(rules.pre) || !_.isUndefined(rules.post) || " +
+            "!_.isUndefined(rules.throwEnsures) || " +
+            "(!_.isUndefined(rules.isConstructor) && " +
+            "!_.isUndefined(rules.invariant))",
+          "_.isUndefined(rules.isConstructor) || " +
+            "_.isBoolean(rules.isConstructor)",
+          "_.isUndefined(rules.pre) || _.isArray(rules.pre)",
+          "_.isUndefined(rules.pre) || _.all(rules.pre, _.isString)",
+          "_.isUndefined(rules.post) || _.isArray(rules.post)",
+          "_.isUndefined(rules.post) || _.all(rules.post, _.isString)",
+          "_.isUndefined(rules.invariant) || _.isArray(rules.invariant)",
+          "_.isUndefined(rules.invariant) || " +
+            "_.all(rules.invariant, _.isString)",
+          "_.isUndefined(rules.throwEnsures) || _.isArray(rules.throwEnsures)",
+          "_.isUndefined(rules.throwEnsures) || " +
+            "(_.all(rules.throwEnsures, _.isArray) && " +
+            "_.all(rules.throwEnsures, function (x) {" +
+            "return (x.length === 2) &&_.all(x, _.isString)}))",
+          "_.isFunction(fn)"]
   }, JsContract);
   a.prototype = JsContract.prototype;
   a.contractsOn = JsContract.contractsOn;
